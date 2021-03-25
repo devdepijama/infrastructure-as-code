@@ -1,0 +1,43 @@
+mysql:
+  type: mysql
+  port: 3306
+  credentials:
+    - root
+    - mysql_password
+
+mongo:
+  type: mongo
+  port: 27017
+  credentials:
+    - mongo_user
+    - mongo_password
+  volume: /mongodb/data/db
+
+myservice:
+  type: service
+  ports: 
+    - 8080:8080
+  build: ./business
+  dependencies:
+    - name: cms-database
+      type: mysql
+      target: mysql
+      databases:
+        - name: strapi
+          users:
+            - name: strapi_mysql_user
+              password: strapi_mysql_password
+    - name: cms-bucket
+      type: mongo
+      target: mongo
+      databases:
+        - name: strapi
+          users:
+            - name: strapi_mongo_user
+              password: strapi_mongo_password
+
+
+
+      
+
+
