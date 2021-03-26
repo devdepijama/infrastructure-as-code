@@ -22,13 +22,15 @@ local enrich(settings, fields) =
 local enrichedSettings = enrich(settings, std.objectFields(settings));
 
 local buildDynamically(settings, containers) = 
-    local size = std.length(containers);
-    local container = containers[0];
-    local sum = builder.build(settings[container], settings);
-    if size == 1 then 
-      sum
-    else 
-      sum + buildDynamically(settings, containers[1:size:1]);
+  {
+    [std.objectFields(entry)[0]]: entry[std.objectFields(entry)[0]],
+    for entry in std.flattenArrays(
+      [
+        builder.build(settings[container], settings)
+        for container in containers
+      ]
+    )
+  };
 
 {
   version: "3",
