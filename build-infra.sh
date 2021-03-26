@@ -4,10 +4,6 @@
 BUILD_DIR=".build"
 mkdir -p ${BUILD_DIR}
 
-function generate() {
-    ARGS="$@"
-}
-
 function toJson() {
     FILE=$1
     cat ${FILE} | yq eval -j

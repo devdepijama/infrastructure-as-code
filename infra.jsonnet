@@ -24,7 +24,6 @@ local enrichedSettings = enrich(settings, std.objectFields(settings));
 local buildDynamically(settings, containers) = 
     local size = std.length(containers);
     local container = containers[0];
-    //local sum = containerFactory[container].create(settings[container]);
     local sum = builder.build(settings[container], settings);
     if size == 1 then 
       sum
