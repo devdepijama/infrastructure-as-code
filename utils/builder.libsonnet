@@ -5,10 +5,10 @@ local DEPENDENCIES_FIELD = "dependencies";
 local buildContainer(containerSettings) = 
     factory[containerSettings['type']].create(containerSettings);
 
-local buildDependencies(containerSettings, globalSettings, dependencies) = 
+local buildSetupContainers(containerSettings, globalSettings, dependencies) = 
     local size = std.length(dependencies);
     local dependency = dependencies[0];
-    local entry = factory[dependency.type].handleDependency(
+    local entry = factory[dependency.type].createSetupContainer(
         containerSettings, 
         globalSettings[dependency.target],
         dependency
@@ -17,18 +17,21 @@ local buildDependencies(containerSettings, globalSettings, dependencies) =
     if size == 1 then 
         entry
     else 
-        entry + buildDependencies(containerSettings, globalSettings, dependencies[1:size:1]);
+        entry + buildSetupContainers(containerSettings, globalSettings, dependencies[1:size:1]);
 
-local buildDependenciesBegin(containerSettings, globalSettings) = 
+local buildSetupContainersBegin(containerSettings, globalSettings) = 
     local hasDependencies = std.objectHas(containerSettings, DEPENDENCIES_FIELD);
 
     if hasDependencies then
-        buildDependencies(containerSettings, globalSettings, containerSettings[DEPENDENCIES_FIELD])
+        buildSetupContainers(containerSettings, globalSettings, containerSettings[DEPENDENCIES_FIELD])
     else
         {};
 
+local enrichWithEnvVars(builtContainer, containerSettings) =
+    factory[containerSettings['type']].addDependencies(builtContainer, containerSettings);
+
 {
     build(containerSettings, globalSettings): 
-        buildContainer(containerSettings) +
-        buildDependenciesBegin(containerSettings, globalSettings)
+        enrichWithEnvVars(buildContainer(containerSettings), containerSettings) +
+        buildSetupContainersBegin(containerSettings, globalSettings)
 }

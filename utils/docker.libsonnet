@@ -36,5 +36,5 @@ local buildContainer(settings) = {
     },
     container: {
         new(settings) : buildContainer(settings)
-    },
+    }
 }
