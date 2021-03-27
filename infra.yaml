@@ -19,7 +19,7 @@ myservice:
     - 8080:8080
   build: ./business
   dependencies:
-    - name: cms-database
+    - name: cms
       type: mysql
       target: mysql
       databases:
@@ -27,7 +27,7 @@ myservice:
           users:
             - name: strapi_mysql_user
               password: strapi_mysql_password
-    - name: cms-bucket
+    - name: cms
       type: mongo
       target: mongo
       databases:

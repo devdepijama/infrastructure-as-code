@@ -1,7 +1,7 @@
 local factory = import 'container-factory.libsonnet';
 
 local buildContainer(containerSettings) = 
-    factory[containerSettings['type']].create(containerSettings);
+    factory[containerSettings.type].create(containerSettings);
 
 local mapDependency(dependency, containerSettings, globalSettings) =
     factory[dependency.type].createSetupContainer(
@@ -21,15 +21,19 @@ local buildSetupContainers(containerSettings, globalSettings) =
     else
         [];
 
+local enrichWithEnvVars(builtContainer, containerSettings, globalSettings) =
+    local hasDependencies = std.objectHas(containerSettings, "dependencies");
 
-local enrichWithEnvVars(builtContainer, containerSettings) =
-    factory[containerSettings['type']].addDependencies(builtContainer, containerSettings);
+    if hasDependencies then
+        factory[containerSettings.type].addDependencies(builtContainer, containerSettings, globalSettings)
+    else
+        builtContainer;
 
 {
     build(containerSettings, globalSettings): 
         std.flattenArrays(
             [
-                [enrichWithEnvVars(buildContainer(containerSettings), containerSettings)], 
+                [enrichWithEnvVars(buildContainer(containerSettings), containerSettings, globalSettings)], 
                 buildSetupContainers(containerSettings, globalSettings)
             ]
         )

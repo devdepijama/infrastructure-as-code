@@ -19,9 +19,9 @@ local getSetupContainerName(containerName, targetName) =
     }
   }),
 
-  createSetupContainer(dependantContainer, targetContainer, dependencySettings): 
+  createSetupContainer(dependentContainer, targetContainer, dependencySettings): 
     docker.container.new({
-      name: getSetupContainerName(dependantContainer.name, targetContainer.name),
+      name: getSetupContainerName(dependentContainer.name, targetContainer.name),
       build: "./persistence/mysql/",
       environment: {
         MYSQL_HOST: targetContainer.name,
@@ -33,5 +33,28 @@ local getSetupContainerName(containerName, targetName) =
       depends_on: [targetContainer.name]
     }),
 
-  addDependencies(buildContainer, containerSettings): buildContainer
+  addDependencies(builtContainer, containerSettings, globalSettings): builtContainer,
+
+  getDependenciesVars(targetContainer, dependencySettings):
+    local prefix = std.asciiUpper(dependencySettings.name) + "_";
+    local fixedProperties = {
+        [prefix + "MYSQL_HOST"]: targetContainer.name,
+        [prefix + "MYSQL_PORT"]: targetContainer.port
+    };
+    local databases = {
+        [prefix + "MYSQL_DATABASE_" + std.asciiUpper(database.name)]: database.name
+        for database in dependencySettings.databases
+    };
+    local database_users = {
+        [prefix + "MYSQL_DATABASE_" + std.asciiUpper(database.name) + "_USER"]: credential.name
+        for database in dependencySettings.databases
+        for credential in database.users
+    };
+    local database_pass = {
+        [prefix + "MYSQL_DATABASE_" + std.asciiUpper(database.name) + "_PASSORD"]: credential.password
+        for database in dependencySettings.databases
+        for credential in database.users
+    };
+    
+    fixedProperties + databases + database_users + database_pass
 }
