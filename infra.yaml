@@ -13,6 +13,13 @@ mongo:
     - mongo_password
   volume: /mongodb/data/db
 
+postgres:
+  type: postgres
+  port: 5432
+  credentials:
+    - postgres_user
+    - postgres_password
+
 myservice:
   type: service
   ports: 

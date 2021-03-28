@@ -17,7 +17,7 @@ local enrich(settings, fields) =
     if size == 1 then 
       sum
     else 
-      sum + enrich(settings, fields[1:size:1]);
+      sum + enrich(settings, fields[1:size]);
 
 local enrichedSettings = enrich(settings, std.objectFields(settings));
 

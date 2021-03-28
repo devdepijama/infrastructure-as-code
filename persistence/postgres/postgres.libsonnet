@@ -1,7 +1,7 @@
 local docker = import '../../utils/docker.libsonnet';
 
-local MYSQL_IMAGE = "mysql:5.7";
-local MYSQL_DEFAULT_PORT = "3306";
+local POSTGRES_IMAGE = "postgres:9.5";
+local POSTGRES_DEFAULT_PORT = "5432";
 
 local getSetupContainerName(containerName, targetName) =
   containerName + "-" + targetName + "-dependency";
@@ -9,26 +9,28 @@ local getSetupContainerName(containerName, targetName) =
 {
   create(settings): docker.container.new({
     name: settings['name'],
-    image: MYSQL_IMAGE,
+    image: POSTGRES_IMAGE,
     ports: [
-      docker.port.different(settings['port'], MYSQL_DEFAULT_PORT)
+      docker.port.different(settings['port'], POSTGRES_DEFAULT_PORT)
     ],
     restart: "always",
     environment: {
-      MYSQL_ROOT_PASSWORD: settings['credentials'][1]
+      POSTGRES_USER: settings.credentials[0],
+      POSTGRES_PASSWORD: settings.credentials[1],
+      POSTGRES_DB: "default"
     }
   }),
 
   createSetupContainer(dependentContainer, targetContainer, dependencySettings): 
     docker.container.new({
       name: getSetupContainerName(dependentContainer.name, targetContainer.name),
-      build: "./persistence/mysql/",
+      build: "./persistence/postgres/",
       environment: {
-        MYSQL_HOST: targetContainer.name,
-        MYSQL_PORT: targetContainer.port,
-        MYSQL_ROOT_USER: targetContainer.credentials[0],
-        MYSQL_ROOT_PASSWORD: targetContainer.credentials[1],
-        MYSQL_SETUP_INSTRUCTIONS: std.toString(dependencySettings.databases)
+        POSTGRES_HOST: targetContainer.name,
+        POSTGRES_PORT: targetContainer.port,
+        POSTGRES_ROOT_USER: targetContainer.credentials[0],
+        POSTGRES_ROOT_PASSWORD: targetContainer.credentials[1],
+        POSTGRES_SETUP_INSTRUCTIONS: std.toString(dependencySettings.databases)
       },
       depends_on: [targetContainer.name]
     }),
@@ -38,20 +40,20 @@ local getSetupContainerName(containerName, targetName) =
   getDependenciesVars(targetContainer, dependencySettings):
     local prefix = std.asciiUpper(dependencySettings.name) + "_";
     local fixedProperties = {
-        [prefix + "MYSQL_HOST"]: targetContainer.name,
-        [prefix + "MYSQL_PORT"]: targetContainer.port
+        [prefix + "POSTGRES_HOST"]: targetContainer.name,
+        [prefix + "POSTGRES_PORT"]: targetContainer.port
     };
     local databases = {
-        [prefix + "MYSQL_DATABASE_" + std.asciiUpper(database.name)]: database.name
+        [prefix + "POSTGRES_DATABASE_" + std.asciiUpper(database.name)]: database.name
         for database in dependencySettings.databases
     };
     local database_users = {
-        [prefix + "MYSQL_DATABASE_" + std.asciiUpper(database.name) + "_USER"]: credential.name
+        [prefix + "POSTGRES_DATABASE_" + std.asciiUpper(database.name) + "_USER"]: credential.name
         for database in dependencySettings.databases
         for credential in database.users
     };
     local database_pass = {
-        [prefix + "MYSQL_DATABASE_" + std.asciiUpper(database.name) + "_PASSWORD"]: credential.password
+        [prefix + "POSTGRES_DATABASE_" + std.asciiUpper(database.name) + "_PASSWORD"]: credential.password
         for database in dependencySettings.databases
         for credential in database.users
     };

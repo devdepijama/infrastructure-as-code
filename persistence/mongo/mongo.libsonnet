@@ -59,7 +59,7 @@ local getSetupContainerName(containerName, targetName) =
     };
 
     local database_pass = {
-        [prefix + "MONGO_DATABASE_" + std.asciiUpper(database.name) + "_PASSORD"]: credential.password
+        [prefix + "MONGO_DATABASE_" + std.asciiUpper(database.name) + "_PASSWORD"]: credential.password
         for database in dependencySettings.databases
         for credential in database.users
     };
