@@ -5,3 +5,10 @@ local propertyByNameRecursive(properties, args) =
 {
     get(properties, name): propertyByNameRecursive(properties, std.split(name, '.'))
 }
+
+local arrayToObject(array) =
+  local size = std.length(array);
+  if size == 1 then
+    array[0]
+  else
+    array[0] + arrayToObject(array[1:size]);
