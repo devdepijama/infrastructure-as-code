@@ -13,6 +13,8 @@ local arrayToObject(array) =
 {
   create(settings): docker.container.new(settings),
 
+  createAuxiliaryContainers(containerSettings, globalSettings): [],
+
   addDependencies(builtContainer, containerSettings, globalSettings): 
     self.create(
       containerSettings + {

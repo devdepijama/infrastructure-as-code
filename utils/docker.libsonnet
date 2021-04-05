@@ -21,6 +21,7 @@ local buildContainer(settings) = {
     + optionalField(settings, "ports")
     + optionalField(settings, "restart")
     + optionalField(settings, "environment")
+    + optionalField(settings, "command")
     + optionalField(settings, "volumes")
     + optionalField(settings, "depends_on")
     + mutualExclusiveFields(settings, "build", "image")
