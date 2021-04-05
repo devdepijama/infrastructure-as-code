@@ -5,6 +5,22 @@ postgres:
     - postgres_user
     - postgres_password
 
+keycloak:
+  type: keycloak
+  port: 8080
+  credentials:
+    - admin
+    - admin
+  dependencies:
+  - name: keycloakdatabase
+    type: postgres
+    target: postgres
+    databases:
+      - name: keycloak
+        users:
+          - name: keycloak
+            password: keycloak_password
+
 kong:
   type: kong
   ports: 
