@@ -4,6 +4,8 @@ local postgres = import '../persistence/postgres/postgres.libsonnet';
 
 local kong = import '../gateway/kong/kong.libsonnet';
 
+local keycloak = import '../auth/keycloak/keycloak.libsonnet';
+
 local service = import '../business/service.libsonnet';
 
 {
@@ -12,5 +14,7 @@ local service = import '../business/service.libsonnet';
     "service": service,
     "postgres": postgres,
 
-    "kong": kong
+    "kong": kong,
+
+    "keycloak": keycloak
 }
