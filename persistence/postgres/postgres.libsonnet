@@ -21,6 +21,8 @@ local getSetupContainerName(containerName, targetName) =
     }
   }),
 
+  createAuxiliaryContainers(containerSettings, globalSettings): [],
+
   createSetupContainer(dependentContainer, targetContainer, dependencySettings): 
     docker.container.new({
       name: getSetupContainerName(dependentContainer.name, targetContainer.name),

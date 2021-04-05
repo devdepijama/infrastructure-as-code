@@ -38,6 +38,8 @@ local getSetupContainerName(containerName, targetName) =
       depends_on: [targetContainer.name]
     }),
 
+  createAuxiliaryContainers(containerSettings, globalSettings): [],
+
   addDependencies(builtContainer, containerSettings, globalSettings): builtContainer,
 
   getDependenciesVars(targetContainer, dependencySettings):

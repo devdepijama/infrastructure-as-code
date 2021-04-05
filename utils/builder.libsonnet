@@ -21,6 +21,9 @@ local buildSetupContainers(containerSettings, globalSettings) =
     else
         [];
 
+local buildAuxiliaryContainers(containerSettings, globalSettings) =
+    factory[containerSettings.type].createAuxiliaryContainers(containerSettings, globalSettings);
+
 local enrichWithEnvVars(builtContainer, containerSettings, globalSettings) =
     local hasDependencies = std.objectHas(containerSettings, "dependencies");
 
@@ -34,6 +37,7 @@ local enrichWithEnvVars(builtContainer, containerSettings, globalSettings) =
         std.flattenArrays(
             [
                 [enrichWithEnvVars(buildContainer(containerSettings), containerSettings, globalSettings)], 
+                buildAuxiliaryContainers(containerSettings, globalSettings),
                 buildSetupContainers(containerSettings, globalSettings)
             ]
         )
